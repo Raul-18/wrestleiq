@@ -93,6 +93,7 @@ export default function VideoBreakdown() {
   const isDemo = id === DEMO_MATCH_ID;
   const matchId = isDemo ? null : Number(id);
   const videoRef = useRef(null);
+  const videoSectionRef = useRef(null);
   const ytPlayerRef = useRef(null);
 
   const [match, setMatch] = useState(null);
@@ -312,6 +313,13 @@ export default function VideoBreakdown() {
     }
   }
 
+  function scrollVideoIntoView() {
+    videoSectionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+
   function jumpTo(time) {
     const seekTime = Math.max(0, Number(time) - TAG_PREROLL_SECONDS);
     const p = ytPlayerRef.current;
@@ -322,12 +330,14 @@ export default function VideoBreakdown() {
       } catch {
         /* ignore */
       }
+      scrollVideoIntoView();
       return;
     }
     const el = videoRef.current;
     if (!el) return;
     el.currentTime = seekTime;
     el.play().catch(() => {});
+    scrollVideoIntoView();
   }
 
   if (loading) {
@@ -375,7 +385,11 @@ export default function VideoBreakdown() {
         </div>
       </div>
 
-      <section className="card video-card">
+      <section
+        ref={videoSectionRef}
+        className="card video-card"
+        style={{ scrollMarginTop: '5.5rem' }}
+      >
         {isDemo ? (
           <p className="muted small" style={{ marginTop: 0 }}>
             Demo mode: tags and stats reset when you refresh.
